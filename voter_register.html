@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Voter Registration</title>
+
+<link rel="stylesheet" href="/static/css/style.css">
+<script src="/static/js/camera.js" defer></script>
+
+<style>
+.hidden{ display:none; }
+
+.preview-box{
+  width:320px;
+  height:240px;
+  border-radius:12px;
+  margin-top:10px;
+  border:3px solid #2ec4c6;
+  object-fit:cover;
+}
+</style>
+
+</head>
+<body>
+
+<div class="page-center">
+<div class="login-card">
+
+<h2>Voter Registration</h2>
+
+<form method="POST" enctype="multipart/form-data" onsubmit="return validatePwd()">
+
+<!-- ================= PERSONAL DETAILS ================= -->
+<h3 class="section-title">Personal Details</h3>
+
+<input type="text" name="username" placeholder="Username" required>
+<input type="password" id="pwd" name="password" placeholder="Password" required>
+<input type="password" id="cpwd" placeholder="Confirm Password" required>
+<input type="text" name="address" placeholder="Address" required>
+
+<!-- ================= FACE CAPTURE ================= -->
+<h3 class="section-title">Face Capture</h3>
+
+<div class="face-actions">
+
+<button type="button" class="btn-primary" onclick="startCamera(); showCapture();">
+📷 Start Camera
+</button>
+
+<div class="camera-wrapper hidden" id="cameraBox">
+  <video id="cam" autoplay playsinline></video>
+</div>
+
+<button type="button" class="btn-secondary hidden" id="captureBtn" onclick="captureImage()">
+✔ Capture Face
+</button>
+
+<img id="preview" class="preview-box hidden">
+
+<canvas id="canvas" width="320" height="240" hidden></canvas>
+
+<input type="file" id="photo" name="photo" hidden required>
+
+</div>
+
+<!-- ================= SUBMIT ================= -->
+<button type="submit" class="btn-primary">
+Register
+</button>
+
+<p class="login-redirect">
+Already registered?
+<a href="/login">Login here</a>
+</p>
+
+</form>
+</div>
+</div>
+
+<script>
+
+/* Show camera UI */
+function showCapture(){
+    document.getElementById("cameraBox").classList.remove("hidden");
+    document.getElementById("captureBtn").classList.remove("hidden");
+}
+
+/* Capture Image */
+function captureImage(){
+
+    const video = document.getElementById("cam");
+    const canvas = document.getElementById("canvas");
+    const preview = document.getElementById("preview");
+    const fileInput = document.getElementById("photo");
+
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0, 320, 240);
+
+    const dataURL = canvas.toDataURL("image/png");
+
+    preview.src = dataURL;
+    preview.classList.remove("hidden");
+
+    stopCamera();
+
+    /* Convert Base64 to File and assign to input */
+    fetch(dataURL)
+      .then(res => res.blob())
+      .then(blob => {
+          const file = new File([blob], "face.png", {type:"image/png"});
+          const container = new DataTransfer();
+          container.items.add(file);
+          fileInput.files = container.files;
+      });
+}
+
+/* Password Validation */
+function validatePwd(){
+  let p = document.getElementById("pwd").value;
+  let c = document.getElementById("cpwd").value;
+
+  if(p !== c){
+    alert("Passwords do not match!");
+    return false;
+  }
+  return true;
+}
+
+</script>
+
+</body>
+</html>

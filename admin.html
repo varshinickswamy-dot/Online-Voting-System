@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Dashboard</title>
+
+<link rel="stylesheet" href="/static/css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+/* ---------- PAGE ---------- */
+
+body{
+    background:#0f1720;
+    color:white;
+    font-family:Arial;
+}
+
+/* ---------- ADMIN CONTAINER ---------- */
+
+.admin-container{
+    padding:40px;
+}
+
+.section-title{
+    font-size:26px;
+    margin-bottom:20px;
+}
+
+/* ---------- USERS TWO COLUMN ---------- */
+
+.users-section{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:40px;
+}
+
+/* ---------- USER CARDS ---------- */
+
+.user-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+    gap:20px;
+}
+
+.user-card{
+    background:#1f2a33;
+    padding:20px;
+    border-radius:14px;
+    text-align:center;
+}
+
+.user-card img{
+    width:90px;
+    height:90px;
+    border-radius:50%;
+    object-fit:cover;
+    border:3px solid #2b7cff;
+    margin-bottom:10px;
+}
+
+.user-name{
+    font-size:20px;
+    font-weight:600;
+}
+
+.user-role{
+    padding:4px 12px;
+    border-radius:12px;
+    font-size:14px;
+    display:inline-block;
+    margin:6px 0;
+}
+
+.user-role.voter{
+    background:#00c853;
+}
+
+.user-role.candidate{
+    background:#ff9800;
+}
+
+.user-address{
+    color:#ccc;
+}
+
+/* ---------- RESULTS ---------- */
+
+.results-section{
+    margin-top:60px;
+}
+
+.result-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+    gap:20px;
+    margin-top:20px;
+}
+
+.result-card{
+    background:#1f2a33;
+    padding:18px;
+    border-radius:12px;
+    text-align:center;
+}
+
+.result-card h4{
+    margin-bottom:8px;
+}
+
+.result-count{
+    font-size:26px;
+    color:#00e6e6;
+    font-weight:bold;
+}
+
+/* ---------- LOGOUT ---------- */
+
+.logout-btn{
+    margin-top:50px;
+    background:#ff4b4b;
+    padding:14px 35px;
+    border-radius:10px;
+    color:white;
+    text-decoration:none;
+    display:inline-block;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="admin-container">
+
+<h1>🛠 Admin Dashboard</h1>
+
+<!-- ================= USERS SECTION ================= -->
+
+<div class="users-section">
+
+<!-- ---------- VOTERS ---------- -->
+
+<div>
+
+<h2 class="section-title">Voters</h2>
+
+<div class="user-grid">
+
+{% for u in users %}
+{% if u[3]=='voter' %}
+
+<div class="user-card">
+
+<img src="/static/uploads/voters/{{u[5]}}">
+
+<div class="user-name">{{u[1]}}</div>
+
+<span class="user-role voter">
+Voter
+</span>
+
+<div class="user-address">{{u[4]}}</div>
+
+</div>
+
+{% endif %}
+{% endfor %}
+
+</div>
+
+</div>
+
+<!-- ---------- CANDIDATES ---------- -->
+
+<div>
+
+<h2 class="section-title">Candidates</h2>
+
+<div class="user-grid">
+
+{% for u in users %}
+{% if u[3]=='candidate' %}
+
+<div class="user-card">
+
+<img src="/static/uploads/candidates/{{u[5]}}">
+
+<div class="user-name">{{u[1]}}</div>
+
+<span class="user-role candidate">
+Candidate
+</span>
+
+<div class="user-address">{{u[4]}}</div>
+
+</div>
+
+{% endif %}
+{% endfor %}
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- ================= RESULTS ================= -->
+
+<div class="results-section">
+
+<h2 class="section-title">Voting Results</h2>
+
+<div class="result-grid">
+
+{% for v in votes %}
+
+<div class="result-card">
+
+<h4>{{v[0]}}</h4>
+
+<div class="result-count">{{v[1]}}</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+<br><br>
+
+<canvas id="chart"></canvas>
+
+</div>
+
+<!-- ================= LOGOUT ================= -->
+
+<a href="/logout" class="logout-btn">Logout</a>
+
+</div>
+
+<!-- ================= CHART ================= -->
+
+<script>
+
+let labels = {{ votes|map(attribute=0)|list }};
+let data = {{ votes|map(attribute=1)|list }};
+
+new Chart(document.getElementById("chart"), {
+
+type: "bar",
+
+data: {
+labels: labels,
+datasets: [{
+label: "Votes",
+data: data,
+backgroundColor: "#00e6e6",
+borderRadius: 8
+}]
+},
+
+options:{
+responsive:true,
+scales:{
+x:{ ticks:{ color:"white" }},
+y:{ ticks:{ color:"white" }, beginAtZero:true }
+},
+plugins:{
+legend:{ labels:{ color:"white" }}
+}
+}
+
+});
+
+</script>
+
+</body>
+</html>

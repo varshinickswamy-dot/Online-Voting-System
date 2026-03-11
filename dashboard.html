@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>Voting Dashboard</title>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<script src="{{ url_for('static', filename='js/camera.js') }}" defer></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    startCamera();
+});
+</script>
+
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+<!-- ================= LEFT PANEL ================= -->
+<div class="dash-left">
+
+<h2>Voter Profile</h2>
+
+<!-- PROFILE IMAGE FIX -->
+{% if me[5] %}
+    
+    {% if me[3] == "candidate" %}
+        <img src="{{ url_for('static', filename='uploads/candidates/' + me[5]) }}" class="profile-pic">
+    {% else %}
+        <img src="{{ url_for('static', filename='uploads/voters/' + me[5]) }}" class="profile-pic">
+    {% endif %}
+
+{% else %}
+
+<img src="{{ url_for('static', filename='uploads/default.png') }}" class="profile-pic">
+
+{% endif %}
+
+<p><b>Name:</b> {{ me[1] }}</p>
+<p><b>Role:</b> {{ me[3] }}</p>
+<p><b>Address:</b> {{ me[4] }}</p>
+
+<p>
+<b>Status:</b>
+{% if me[6]==1 %}
+<span class="status-voted">Voted</span>
+{% else %}
+<span class="status-notvoted">Not Voted</span>
+{% endif %}
+</p>
+
+<h3>Live Verification</h3>
+
+<video id="cam" autoplay muted playsinline class="camera-box"></video>
+
+<a href="/logout" class="logout-btn">Logout</a>
+
+</div>
+
+
+<!-- ================= RIGHT PANEL ================= -->
+<div class="dash-right">
+
+<h2>Select Candidate</h2>
+
+<form method="POST">
+
+<div class="candidate-list">
+
+{% for c in candidates %}
+
+<div class="candidate-row">
+
+<input type="radio" name="vote" value="{{ c[0] }}" required>
+
+<img src="{{ url_for('static', filename='uploads/candidates/' + c[2]) }}"
+     class="candidate-img">
+
+<div class="candidate-name">
+{{ c[1] }}
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+<br>
+
+{% if me[6]==1 %}
+<button class="vote-btn" disabled>Already Voted</button>
+{% else %}
+<button type="submit" class="vote-btn">Submit Vote</button>
+{% endif %}
+
+</form>
+
+</div>
+
+</div>
+
+</body>
+</html>
